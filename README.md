@@ -12,7 +12,7 @@ A 3-step onboarding flow (Profile → Company → Review) with:
 
 ## Live Preview
 
-[Add your CodePen / StackBlitz / GitHub Pages link here]
+https://dreadclamity.github.io/The-Multi-Step-Checkout-Onboarding-Form/
 
 ## Build Process
 
