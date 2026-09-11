@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Corporate Onboarding - V3</title>
+<style>
+  /* Eye-Relaxing Corporate Color Palette */
+  :root {
+    --bg-color: #F4F7F6;
+    --card-bg: #FFFFFF;
+    --primary-color: #4A6572;
+    --primary-hover: #34495E;
+    --text-main: #2C3E50;
+    --text-muted: #596A6B; /* Darkened to pass WCAG AA 4.5:1 ratio */
+    --border-color: #D5DBDB;
+    --error-color: #E74C3C;
+    --success-color: #27AE60;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+
+  .form-container {
+    background: var(--card-bg);
+    width: 100%;
+    max-width: 600px;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
+  }
+
+  h2 {
+    margin-top: 0;
+    color: var(--primary-color);
+    text-align: center;
+  }
+  
+  h2:focus {
+    outline: none;
+  }
+
+  /* Step Indicators */
+  .step-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+  }
+  
+  .step {
+    flex: 1;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 3px solid var(--border-color);
+    color: var(--text-muted);
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .step.active {
+    border-bottom-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+
+  .step.completed {
+    border-bottom-color: var(--success-color);
+    color: var(--success-color);
+  }
+
+  /* Form Sections */
+  .form-section {
+    display: none;
+  }
+  
+  .form-section.active {
+    display: block;
+    animation: fadeIn 0.4s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .input-group {
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 0.9em;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1em;
+    color: var(--text-main);
+  }
+
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(74, 101, 114, 0.2);
+  }
+
+  .error-message {
+    color: var(--error-color);
+    font-size: 0.8em;
+    margin-top: 5px;
+    display: none;
+  }
+
+  .has-error input {
+    border-color: var(--error-color);
+  }
+  
+  .has-error .error-message {
+    display: block;
+  }
+
+  /* Buttons */
+  .button-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+  }
+
+  button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1em;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+  }
+
+  button:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+  }
+
+  .btn-prev {
+    background-color: var(--bg-color);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+  }
+
+  .btn-prev:hover {
+    background-color: #EAECEE;
+  }
+
+  .btn-next, .btn-submit {
+    background-color: var(--primary-color);
+    color: white;
+  }
+
+  .btn-next:hover, .btn-submit:hover {
+    background-color: var(--primary-hover);
+  }
+
+  /* Success State */
+  .success-state {
+    display: none;
+    text-align: center;
+    padding: 40px 0;
+  }
+  
+  .success-state h3 {
+    color: var(--success-color);
+  }
+
+  /* Mobile Responsiveness */
+  @media (max-width: 480px) {
+    .form-container {
+      padding: 20px;
+    }
+    .step-indicator {
+      gap: 5px;
+    }
+    .step {
+      font-size: 0.8rem;
+      padding-bottom: 5px;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 0.9em;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="form-container">
+  <!-- Progress Indicator -->
+  <div class="step-indicator" id="stepIndicator">
+    <div class="step active">1. Profile</div>
+    <div class="step">2. Company</div>
+    <div class="step">3. Review</div>
+  </div>
+
+  <form id="onboardingForm">
+    <!-- Step 1: Personal Info -->
+    <div class="form-section active" data-step="1">
+      <h2 tabindex="-1">Professional Profile</h2>
+      <div class="input-group">
+        <label for="fullName">Full Name *</label>
+        <input type="text" id="fullName" name="fullName" placeholder="Jane Doe" aria-describedby="fullNameError" aria-invalid="false">
+        <div class="error-message" id="fullNameError">Full name is required.</div>
+      </div>
+      <div class="input-group">
+        <label for="email">Work Email *</label>
+        <input type="email" id="email" name="email" placeholder="jane.doe@company.com" aria-describedby="emailError" aria-invalid="false">
+        <div class="error-message" id="emailError">Please enter a valid work email.</div>
+      </div>
+    </div>
+
+    <!-- Step 2: Company Details -->
+    <div class="form-section" data-step="2">
+      <h2 tabindex="-1">Company Details</h2>
+      <div class="input-group">
+        <label for="companyName">Organization Name *</label>
+        <input type="text" id="companyName" name="companyName" placeholder="Acme Corp" aria-describedby="companyError" aria-invalid="false">
+        <div class="error-message" id="companyError">Organization name is required.</div>
+      </div>
+      <div class="input-group">
+        <label for="department">Department</label>
+        <select id="department" name="department" aria-invalid="false">
+          <option value="">Select a department</option>
+          <option value="IT">Information Technology</option>
+          <option value="HR">Human Resources</option>
+          <option value="Finance">Finance</option>
+          <option value="Operations">Operations</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Step 3: Confirmation -->
+    <div class="form-section" data-step="3">
+      <h2 tabindex="-1">Review & Submit</h2>
+      <p style="color: var(--text-muted); font-size: 0.9em; line-height: 1.5;">
+        Please review the information you have provided. By clicking submit, you confirm that these details will be used to set up your corporate workspace profile.
+      </p>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="button-group" id="buttonGroup">
+      <button type="button" class="btn-prev" id="btnPrev" style="visibility: hidden;">Previous</button>
+      <button type="button" class="btn-next" id="btnNext">Continue</button>
+      <button type="submit" class="btn-submit" id="btnSubmit" style="display: none;">Submit Registration</button>
+    </div>
+  </form>
+
+  <!-- Success Message -->
+  <div class="success-state" id="successState">
+    <h3 tabindex="-1">Registration Successful</h3>
+    <p>Your corporate profile has been established securely.</p>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('onboardingForm');
+  const steps = document.querySelectorAll('.form-section');
+  const indicators = document.querySelectorAll('.step');
+  const btnPrev = document.getElementById('btnPrev');
+  const btnNext = document.getElementById('btnNext');
+  const btnSubmit = document.getElementById('btnSubmit');
+  const stepIndicator = document.getElementById('stepIndicator');
+  const successState = document.getElementById('successState');
+
+  let currentStep = 0;
+
+  function updateUI() {
+    steps.forEach((step, index) => {
+      step.classList.toggle('active', index === currentStep);
+    });
+
+    indicators.forEach((indicator, index) => {
+      if (index < currentStep) {
+        indicator.classList.add('completed');
+        indicator.classList.remove('active');
+      } else if (index === currentStep) {
+        indicator.classList.add('active');
+        indicator.classList.remove('completed');
+      } else {
+        indicator.classList.remove('active', 'completed');
+      }
+    });
+
+    btnPrev.style.visibility = currentStep === 0 ? 'hidden' : 'visible';
+    
+    if (currentStep === steps.length - 1) {
+      btnNext.style.display = 'none';
+      btnSubmit.style.display = 'block';
+    } else {
+      btnNext.style.display = 'block';
+      btnSubmit.style.display = 'none';
+    }
+
+    // Accessibility: Move focus to the first input or heading of the new step
+    const currentSection = steps[currentStep];
+    const firstInput = currentSection.querySelector('input, select');
+    const heading = currentSection.querySelector('h2');
+    
+    if (firstInput) {
+      firstInput.focus();
+    } else if (heading) {
+      heading.focus();
+    }
+  }
+
+  function validateCurrentStep() {
+    const currentSection = steps[currentStep];
+    const inputs = currentSection.querySelectorAll('input[type="text"], input[type="email"]');
+    let isValid = true;
+
+    inputs.forEach(input => {
+      const group = input.parentElement;
+      
+      if (input.value.trim() === '') {
+        group.classList.add('has-error');
+        input.setAttribute('aria-invalid', 'true');
+        isValid = false;
+      } else {
+        if (input.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value)) {
+           group.classList.add('has-error');
+           input.setAttribute('aria-invalid', 'true');
+           isValid = false;
+        } else {
+           group.classList.remove('has-error');
+           input.setAttribute('aria-invalid', 'false');
+        }
+      }
+    });
+    return isValid;
+  }
+
+  btnNext.addEventListener('click', () => {
+    if (validateCurrentStep()) {
+      currentStep++;
+      updateUI();
+    }
+  });
+
+  btnPrev.addEventListener('click', () => {
+    if (currentStep > 0) {
+      currentStep--;
+      updateUI();
+    }
+  });
+
+  // Updated Submit Handler
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (validateCurrentStep()) {
+      // Check if we are on the final step
+      if (currentStep === steps.length - 1) {
+        // Final Submission Logic
+        form.style.display = 'none';
+        stepIndicator.style.display = 'none';
+        successState.style.display = 'block';
+        successState.querySelector('h3').focus();
+      } else {
+        // Intercept implicit "Enter" submission and advance the step instead
+        currentStep++;
+        updateUI();
+      }
+    }
+  });
+</script>
+</body>
+</html>
